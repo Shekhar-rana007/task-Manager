@@ -50,7 +50,36 @@ const getTasks = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+// paginate task
+const paginateTasks = async (req, res) => {
+  try {
+    let { page = 1, limit = 10 } = req.query;
 
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const skip = (page - 1) * limit;
+
+    const totalTasks = await taskModel.countDocuments({ isDeleted: false });
+    const tasks = await taskModel
+      .find({ isDeleted: false })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+    res.status(200).json({
+      success: true,
+      currentPage: page,
+      totalPages: Math.ceil(totalTasks / limit),
+      totalTasks,
+      tasks,
+    });
+  } catch (error) {
+    console.error("Pagination Error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+};
 // update task
 const updateTask = async (req, res) => {
   try {
@@ -103,6 +132,33 @@ const updateTask = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const filterTasks = async (req, res) => {
+  try {
+    const { status, createdBy, title, dueDate } = req.query;
+
+    const filter = {};
+
+    if (status) filter.status = status;
+    if (createdBy) filter.createdBy = createdBy;
+    if (title) filter.title = { $regex: title, $options: "i" };
+    if (dueDate) {
+      const date = new Date(dueDate);
+      const nextDay = new Date(date);
+      nextDay.setDate(nextDay.getDate() + 1);
+
+      filter.dueDate = {
+        $gte: date,
+        $lt: nextDay,
+      };
+    }
+
+    const tasks = await taskModel.find(filter);
+    res.status(200).json({ success: true, tasks });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error });
   }
 };
 
@@ -202,4 +258,6 @@ module.exports = {
   deleteTaskPermanently,
   updateTask,
   deleteTask,
+  filterTasks,
+  paginateTasks,
 };
