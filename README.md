@@ -9,7 +9,6 @@ A simple task manager built using **Node.js**, **Express**, and **MongoDB**. It 
 - Only admins can see all tasks, users see their own
 - Sends email reminders 10 mins before a task is due
 - API to manually send emails
-- Swagger API docs
 
 ## Tech Used
 
