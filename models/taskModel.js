@@ -23,6 +23,10 @@ const taskSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    isMailSent: {
+      type: Boolean,
+      default: false,
+    },
     isDeleted: {
       type: Boolean,
       default: false,

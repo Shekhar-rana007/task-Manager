@@ -2,25 +2,36 @@ const nodemailer = require("nodemailer");
 
 const sendEmail = async (to, subject, text) => {
   try {
+    const testAccount = await nodemailer.createTestAccount();
+
     const transporter = nodemailer.createTransport({
-      service: "Gmail", // or use Ethereal for dev
+      host: "smtp.ethereal.email",
+      port: 587,
       auth: {
-        user: process.env.EMAIL_USER, // Your Gmail address
-        pass: process.env.EMAIL_PASS, // App password or email password
+        user: testAccount.user,
+        pass: testAccount.pass,
       },
     });
 
     const mailOptions = {
-      from: `"Task Manager" <${process.env.EMAIL_USER}>`,
+      from: `"Task Manager" <${testAccount.user}>`,
       to,
       subject,
       text,
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log(`📩 Email sent to ${to}`);
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log(`Email sent to ${to}`);
+    console.log(`Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+
+    return {
+      previewURL: nodemailer.getTestMessageUrl(info),
+      info,
+    };
   } catch (err) {
-    console.error("❌ Email send failed:", err.message);
+    console.error("Email not sent:", err.message);
+    throw err; 
   }
 };
 
