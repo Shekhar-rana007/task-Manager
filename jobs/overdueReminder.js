@@ -18,7 +18,6 @@ cron.schedule("* * * * *", async () => {
     for (let task of tasks) {
       const userEmail = task.createdBy?.email;
       if (!userEmail) continue;
-
       const subject = `Reminder: Task "${task.title}" is almost due!`;
       const message = `Your task "${
         task.title

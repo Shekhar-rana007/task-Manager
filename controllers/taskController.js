@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const createTask = async (req, res) => {
   try {
     const { title, description, status, dueDate, createdBy } = req.body;
-    if (!title || !description || !status || !dueDate) {
+    if (!title || !description || !status || !dueDate || !createdBy) {
       return res.status(400).json({
         success: false,
         message: "all the details are required",
@@ -34,7 +34,7 @@ const getTasks = async (req, res) => {
     const tasks = await taskModel.find({ isDeleted: false }).populate({
       path: "createdBy",
       select: "name email phone",
-      match: { "action.isDeleted": false },
+      match: { "action.isDeleted" : false },
     });
     if (!tasks) {
       return res.status(400).json({
@@ -66,6 +66,7 @@ const paginateTasks = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
+
     res.status(200).json({
       success: true,
       currentPage: page,
@@ -80,6 +81,7 @@ const paginateTasks = async (req, res) => {
       .json({ success: false, message: "Server error", error: error.message });
   }
 };
+
 // update task
 const updateTask = async (req, res) => {
   try {
@@ -156,6 +158,7 @@ const filterTasks = async (req, res) => {
     }
 
     const tasks = await taskModel.find(filter);
+
     res.status(200).json({ success: true, tasks });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error", error });
@@ -244,6 +247,7 @@ const deleteTaskPermanently = async (req, res) => {
       success: true,
       message: "Task deleted successfully",
     });
+
   } catch (err) {
     res.status(500).json({
       success: false,

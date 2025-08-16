@@ -5,8 +5,8 @@ const {
   updateTask,
   deleteTask,
   deleteTaskPermanently,
-  filterTasks,
   paginateTasks,
+  filterTasks,
 } = require("../controllers/taskController");
 
 const { verifyToken } = require("../middlewares/authMiddleware");

@@ -44,14 +44,15 @@ const loginUser = async (req, res) => {
     }
 
     const user = await userModel.findOne({ email });
+
     if (!user || user.action.isDeleted) {
       return res
         .status(404)
         .json({ message: "User not found or deleted", success: false });
     }
 
-    const isMatch = await user.comparePassword(password);
-    console.log("isMatch", isMatch);
+    const isMatch = await user.comparePassword(password); 
+    
     if (!isMatch) {
       return res
         .status(401)
